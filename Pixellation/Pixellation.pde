@@ -53,7 +53,9 @@ void draw() {
         rect(x,y,filter,filter);
       }
     }
-    
+    //Mirror image
+    scale(-1,1); 
+    image(video, 0, 0, -width, height);
   }
 }
 
