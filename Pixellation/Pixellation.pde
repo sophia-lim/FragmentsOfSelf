@@ -11,17 +11,21 @@ import processing.serial.*;
 
 // Create object from Serial class
 Serial myPort;  
+
 // Data received from the serial port
 int val;     
 
 // Number of columns and rows in our system
 int cols, rows;
+
 // Variable to hold onto Capture object
 Capture video;
 PImage output;
 
+// Variables to keep the RGB values of the video's pixels
 float avg_r, avg_g, avg_b;
 
+// Filters for pixellation
 int filter = 20;
 int filter_index = 2;
 int[] filters = {1, 2, 4, 5, 8, 10, 20, 40};
@@ -37,15 +41,25 @@ void setup() {
   
   video = new Capture(this,1280,720,30);
   video.start();
+  
+  // Arduino port
+  String portName = Serial.list()[0];
+  myPort = new Serial(this, portName, 9600);
 }
 
 void draw() {
+  
+  if ( myPort.available() > 0 ) {  // If data is available,
+    val = myPort.read();         // read it and store it in val
+  } 
+  
+  print("BPM: ");
+  println(val); //print it out in the console
   
   if (video.available()) {
     background( 255 );
     video.read();
     pixelateVideo();
-
   }
 }
 
