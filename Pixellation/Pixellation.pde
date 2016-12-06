@@ -13,7 +13,7 @@ int filter_index = 6;
 int[] filters = {1, 2, 4, 5, 8, 10, 20, 40};
 
 void setup() {
-  size(640,360);
+  size(1280,720);
   
   noFill();
   noStroke();
@@ -52,7 +52,8 @@ void draw() {
 
         color col = color(avg_r/(filter*filter), avg_g/(filter*filter), avg_b/(filter*filter));
         fill( col );
-        rect(video.width-x,y,filter,filter);
+        //Mirror image and fix the offset from the filter
+        rect(video.width-x-filter,y,filter,filter);
       }
     }
     video.updatePixels();
