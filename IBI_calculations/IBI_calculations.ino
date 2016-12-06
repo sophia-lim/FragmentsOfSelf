@@ -1,3 +1,5 @@
+#define blinkPin 13
+
 volatile int rate[10];                    // array to hold last ten IBI values
 volatile unsigned long sampleCounter = 0;          // used to determine pulse timing
 volatile unsigned long lastBeatTime = 0;           // used to find IBI
@@ -7,6 +9,28 @@ volatile int thresh = 512;                // used to find instant moment of hear
 volatile int amp = 100;                   // used to hold amplitude of pulse waveform, seeded
 volatile boolean firstBeat = true;        // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat = false;      // used to seed rate array so we startup with reasonable BPM
+
+// Volatile Variables, used in the interrupt service routine!
+volatile int BPM;                   // int that holds raw Analog in 0. updated every 2mS
+volatile int Signal;                // holds the incoming raw data
+volatile int IBI = 600;             // int that holds the time interval between beats! Must be seeded! 
+volatile boolean Pulse = false;     // "True" when User's live heartbeat is detected. "False" when not a "live beat". 
+volatile boolean QS = false;        // becomes true when Arduino finds a beat.
+
+void setup(){
+  pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
+  Serial.begin(115200);             // we agree to talk fast!
+  
+  //Sets up to read Pulse Sensor signal every 2mS
+  interruptSetup();
+}
+
+void loop(){
+    // Quantified Self flag is true when arduino finds a heartbeat
+    if (QS == true){           
+      Serial.write(BPM);
+    }
+}
 
 void interruptSetup(){     
   // Initializes Timer2 to throw an interrupt every 2mS.
@@ -21,7 +45,7 @@ void interruptSetup(){
 // Timer 2 makes sure that we take a reading every 2 miliseconds
 ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts to 124
   cli();                                      // disable interrupts while we do this
-  Signal = analogRead(pulsePin);              // read the Pulse Sensor 
+  Signal = analogRead(A0);              // read the Pulse Sensor 
   sampleCounter += 2;                         // keep track of the time in mS with this variable
   int N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
 

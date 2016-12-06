@@ -17,5 +17,6 @@ void draw()
   {  // If data is available,
   val = myPort.read();         // read it and store it in val
   } 
-println(val); //print it out in the console
+  print("BPM: ");
+  println(val); //print it out in the console
 }
