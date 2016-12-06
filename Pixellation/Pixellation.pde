@@ -21,7 +21,7 @@ void setup() {
   
   filter = filters[filter_index];
   
-  video = new Capture(this,800,600,30);
+  video = new Capture(this,1280,720,30);
   video.start();
 }
 
@@ -32,6 +32,9 @@ void draw() {
     video.read();
     
     video.loadPixels();
+    //  scale(-1,1); 
+    //  image(video, 0, 0, -width, height);
+    
     
     for (int x = 0; x < video.width; x+=filter) {
       for (int y = 0; y < video.height; y+=filter ) {
@@ -41,7 +44,6 @@ void draw() {
         for (int r = x; r < x+filter; r++) {
           for (int c = y; c < y+filter; c++ ) {
             int loc = r + c*video.width;
-
             avg_r += red   (video.pixels[loc]);
             avg_g += green (video.pixels[loc]);
             avg_b += blue  (video.pixels[loc]);
@@ -50,12 +52,10 @@ void draw() {
 
         color col = color(avg_r/(filter*filter), avg_g/(filter*filter), avg_b/(filter*filter));
         fill( col );
-        rect(x,y,filter,filter);
+        rect(video.width-x,y,filter,filter);
       }
     }
-    //Mirror image
-    scale(-1,1); 
-    image(video, 0, 0, -width, height);
+    video.updatePixels();
   }
 }
 
