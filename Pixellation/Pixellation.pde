@@ -53,18 +53,20 @@ void setup() {
   heartbeat.play();
   
   // Arduino port
-  //String portName = Serial.list()[0];
-  //myPort = new Serial(this, portName, 115200);
+  String portName = Serial.list()[0];
+  myPort = new Serial(this, portName, 115200);
 }
 
 void draw() {
   
-  //if ( myPort.available() > 0 ) {  // If data is available,
-  //  val = myPort.read();         // read it and store it in val
-  //} 
+  if ( myPort.available() > 0 ) {  // If data is available,
+    val = myPort.read();         // read it and store it in val
+  } 
   
-  //print("BPM: ");
-  //println(val); //print it out in the console
+  val *= 2;
+  
+  print("BPM: ");
+  println(val); //print it out in the console
   
   if (video.available()) {
     background( 255 );
