@@ -1,4 +1,18 @@
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+import ddf.minim.signals.*;
+import ddf.minim.spi.*;
+import ddf.minim.ugens.*;
+
 import processing.video.*;
+import processing.serial.*;
+
+
+// Create object from Serial class
+Serial myPort;  
+// Data received from the serial port
+int val;     
 
 // Number of columns and rows in our system
 int cols, rows;
@@ -9,7 +23,7 @@ PImage output;
 float avg_r, avg_g, avg_b;
 
 int filter = 20;
-int filter_index = 6;
+int filter_index = 2;
 int[] filters = {1, 2, 4, 5, 8, 10, 20, 40};
 
 void setup() {
@@ -30,14 +44,16 @@ void draw() {
   if (video.available()) {
     background( 255 );
     video.read();
-    
+    pixelateVideo();
+
+  }
+}
+
+void pixelateVideo() {
     video.loadPixels();
-    //  scale(-1,1); 
-    //  image(video, 0, 0, -width, height);
-    
     
     for (int x = 0; x < video.width; x+=filter) {
-      for (int y = 0; y < video.height; y+=filter ) {
+      for (int y = 0; y < video.height; y+=filter) {
 
         avg_r = avg_g = avg_b = 255.0;
         
@@ -52,12 +68,12 @@ void draw() {
 
         color col = color(avg_r/(filter*filter), avg_g/(filter*filter), avg_b/(filter*filter));
         fill( col );
+        
         //Mirror image and fix the offset from the filter
         rect(video.width-x-filter,y,filter,filter);
       }
     }
     video.updatePixels();
-  }
 }
 
 void keyPressed() {
