@@ -8,12 +8,11 @@ import ddf.minim.ugens.*;
 import processing.video.*;
 import processing.serial.*;
 
-
 // Create object from Serial class
 Serial myPort;  
 
 // Data received from the serial port
-int val;     
+int val = 300;    
 
 // Number of columns and rows in our system
 int cols, rows;
@@ -27,39 +26,69 @@ float avg_r, avg_g, avg_b;
 
 // Filters for pixellation
 int filter = 20;
-int filter_index = 2;
+int filter_index = 4;
 int[] filters = {1, 2, 4, 5, 8, 10, 20, 40};
 
+// Audio
+Minim minim;
+AudioPlayer heartbeat;
+AudioInput input;
+
+String state = "Healthy";
+
 void setup() {
-  size(1280,720);
-  
+  size(800,600);
   noFill();
   noStroke();
   smooth();
   
+  // Video initializers
   filter = filters[filter_index];
-  
-  video = new Capture(this,1280,720,30);
+  video = new Capture(this,width,height);
   video.start();
   
+  // Audio initializers
+  minim = new Minim(this);
+  heartbeat = minim.loadFile("soundscape.wav");
+  heartbeat.play();
+  
   // Arduino port
-  String portName = Serial.list()[0];
-  myPort = new Serial(this, portName, 115200);
+  //String portName = Serial.list()[0];
+  //myPort = new Serial(this, portName, 115200);
 }
 
 void draw() {
   
-  if ( myPort.available() > 0 ) {  // If data is available,
-    val = myPort.read();         // read it and store it in val
-  } 
+  //if ( myPort.available() > 0 ) {  // If data is available,
+  //  val = myPort.read();         // read it and store it in val
+  //} 
   
-  print("BPM: ");
-  println(val); //print it out in the console
+  //print("BPM: ");
+  //println(val); //print it out in the console
   
   if (video.available()) {
     background( 255 );
     video.read();
+    setFilter();
     pixelateVideo();
+    fill(255);
+    text("Current BPM: \n" + val, 20, 20);
+    text("Current fitness state: \n" + state, 20, 60);
+  }
+}
+
+void setFilter() {
+  if (val > 20 && val < 100) {
+    filter_index = 2;
+    state = "Healthy";
+  } else if ( val > 100 && val < 200 ) {
+    filter_index = 3;
+  } else if ( val > 200 && val < 250 ) {
+    filter_index = 4;
+  } else if ( val > 250 && val < 300 ) {
+    filter_index = 5;
+  } else if ( val > 300 ) {
+    filter_index = 6;
   }
 }
 
@@ -90,7 +119,7 @@ void pixelateVideo() {
     video.updatePixels();
 }
 
-void keyPressed() {
+void keyReleased() {
   if( keyCode == 38 ) {
     filter_index++;
   } else if( keyCode == 40 ) {
@@ -102,5 +131,4 @@ void keyPressed() {
   } else if( filter_index > 7 ) {
     filter_index = 7;
   }
-  
 }
